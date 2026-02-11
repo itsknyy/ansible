@@ -1,4 +1,4 @@
-name: Deploy Nginx with Ansible
+name: Deploy Nginx Custom Page
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
 
 jobs:
   deploy:
-    name: Run Ansible Playbooks
+    name: Deploy via Ansible
     runs-on: ubuntu-latest
 
     steps:
@@ -16,21 +16,22 @@ jobs:
 
       - name: Install Ansible
         run: |
-          sudo apt update
-          sudo apt install -y ansible
+          sudo apt-get update
+          sudo apt-get install -y ansible
 
-      - name: Setup SSH key
+      - name: Configure SSH
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.ANSIBLE_SSH_KEY }}" > private-key.pem
-          chmod 400 ~/.ssh/id_rsa
-          ssh-keyscan -H 3.85.224.195 >> ~/.ssh/known_hosts
-          ssh-keyscan -H 52.203.76.206 >> ~/.ssh/known_hosts
+          chmod 700 ~/.ssh
+          echo -e "Host *\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
+          chmod 600 ~/.ssh/config
 
-      - name: Run Nginx install playbook
+      - name: Setup SSH private key
         run: |
-          ansible-playbook -i inventory.yaml playbook-nginx.yaml
+          echo "${{ secrets.SSH_KEY64 }}" | base64 -d > mykey.pem
+          chmod 400 mykey.pem
 
-      - name: Run custom page playbook
+      - name: Deploy using Ansible
         run: |
-          ansible-playbook -i inventory.yaml custom-playbook.yaml
+          ansible-playbook -i inventory.yml custom-playbook.yaml \
+            --private-key mykey.pem
