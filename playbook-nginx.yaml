@@ -1,0 +1,22 @@
+- name: Install and run Nginx on server nodes
+  hosts: server_nodes
+  become: true
+
+  tasks:
+    - name: Check connectivity
+      ping:
+
+    - name: Install nginx
+      apt:
+        name: nginx
+        state: present
+
+    - name: Create nginx run directory
+      file:
+        path: /run/nginx
+        state: directory
+
+    - name: Start nginx
+      command: nginx
+      args:
+        creates: /run/nginx/nginx.pid
