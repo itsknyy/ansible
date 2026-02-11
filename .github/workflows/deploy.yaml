@@ -22,7 +22,7 @@ jobs:
       - name: Setup SSH key
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.ANSIBLE_SSH_KEY }}" > ~/.ssh/id_rsa
+          echo "${{ secrets.ANSIBLE_SSH_KEY }}" > private-key.pem
           chmod 400 ~/.ssh/id_rsa
           ssh-keyscan -H 3.85.224.195 >> ~/.ssh/known_hosts
           ssh-keyscan -H 52.203.76.206 >> ~/.ssh/known_hosts
